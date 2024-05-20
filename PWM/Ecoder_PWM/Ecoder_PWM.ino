@@ -26,6 +26,7 @@ SOFTWARE.
 
 #define _PWM_LOGLEVEL_        3
 #include "RP2040_PWM.h"
+#include "pio_encoder.h"
 
 // Creates pwm instance
 RP2040_PWM* PWM_Instance;
@@ -35,6 +36,9 @@ RP2040_PWM* PWM_Instance;
 #define PWM_PIN      28
 #define ENCODER_PIN1 2 // Change these pins to match your encoder's connections
 #define ENCODER_PIN2 3 // Change these pins to match your encoder's connections
+
+// Encoder object
+RP2040_Encoder encoder(ENCODER_PIN1, ENCODER_PIN2);
 
 // Variables
 int encoderPos = 0;
@@ -54,8 +58,8 @@ void setup() {
 }
 
 void loop() {
-  // Read encoder position (polling)
-  int newPos = readEncoder();
+  // Read encoder position
+  int newPos = encoder.getPosition();
   if (newPos != prevEncoderPos) {
     // Encoder position has changed
     encoderPos = newPos;
@@ -72,23 +76,6 @@ void loop() {
   }
 }
 
-int readEncoder() {
-  static int state = 0;
-  static int prevState = 0;
-  int encoder = 0;
-  
-  state = digitalRead(ENCODER_PIN1);
-  if (state != prevState) {
-    if (digitalRead(ENCODER_PIN2) != state) {
-      encoder++;
-    } else {
-      encoder--;
-    }
-    prevState = state;
-  }
-  
-  return encoder;
-}
 
 
 
